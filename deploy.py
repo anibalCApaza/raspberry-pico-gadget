@@ -35,7 +35,7 @@ def upload_script() -> None:
         sys.exit(1)
 
     try:
-        subprocess.run(copy_command, check=True, text=False)
+        subprocess.run(copy_command, check=True, text=True)
         print("¡Archivo copiado con éxito! 🎉")
 
     except subprocess.CalledProcessError as e:

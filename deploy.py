@@ -15,8 +15,8 @@ reset_command = ["mpremote", "reset"]
 connect_command = ["mpremote", "connect", pico_port]
 
 
-def generate_progress_bar(callback: Callable[[], None]):
-    for _ in track(range(20)):
+def generate_progress_bar(callback: Callable[[], None], delay: int):
+    for _ in track(range(delay)):
         time.sleep(0.02)
     callback()
 
@@ -77,9 +77,9 @@ def connect_to_microcontroller() -> None:
 
 
 def deploy_to_pico():
-    generate_progress_bar(upload_script)
-    generate_progress_bar(reset_microcontroller)
-    generate_progress_bar(connect_to_microcontroller)
+    generate_progress_bar(upload_script, 20)
+    generate_progress_bar(reset_microcontroller, 100)
+    generate_progress_bar(connect_to_microcontroller, 20)
 
 
 if __name__ == "__main__":

@@ -16,9 +16,9 @@ connect_command = ["mpremote", "connect", pico_port]
 
 
 def generate_progress_bar(callback: Callable[[], None], delay: int):
-    for _ in track(range(delay)):
-        time.sleep(0.02)
     callback()
+    for _ in track(range(delay), "Procesando..."):
+        time.sleep(0.02)
 
 
 def upload_script() -> None:
@@ -36,7 +36,6 @@ def upload_script() -> None:
 
     try:
         subprocess.run(copy_command, check=True, text=True)
-        print("¡Archivo copiado con éxito! 🎉")
 
     except subprocess.CalledProcessError as e:
         print("Error al ejecutar mpremote para copiar el archivo:")
@@ -54,7 +53,6 @@ def reset_microcontroller() -> None:
     print("Reiniciando la Raspberry Pi Pico para ejecutar el nuevo código...")
     try:
         subprocess.run(reset_command, check=True, text=True)
-        print("¡Reinicio completado! El nuevo código ya está en marcha. ✨")
 
     except subprocess.CalledProcessError as e:
         print("Error al ejecutar mpremote para reiniciar la Pico:")

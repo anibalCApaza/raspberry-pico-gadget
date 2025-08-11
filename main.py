@@ -1,9 +1,57 @@
-from machine import Pin  # type: ignore
+#   RST - Reset:                     Pico GP8 (11)
+#   CE - Chip Enable / Chip select : Pico GP5 ( 7)
+#   DC - Data/Command :              Pico GP4 ( 6)
+#   Din - Serial Input (Mosi):       Pico GP7 (10)
+#   Clk - SPI Clock:                 Pico GP6 ( 9)
+#   Vcc:                             Pico 3V3 (36)
+#   BL :                             Pico GP9(12)
+#   Gnd:                             Pico GND (38)
 
+import pcd8544_fb
+from machine import Pin, SPI
 import time
 
-led = Pin(25, Pin.OUT)  # LED integrado
+# pinleri ayarlıyoruz
+spi = SPI(0)
+
+spi = SPI(0, baudrate=2000000, polarity=0, phase=0, sck=Pin(6), mosi=Pin(7))
+
+cs = Pin(5)
+dc = Pin(4)
+rst = Pin(8)
+
+# arkaplan aydınlatmasını açıyoruz
+bl = Pin(9, Pin.OUT, value=1)
+
+# ekranı başlatıyoruz.
+lcd = pcd8544_fb.PCD8544_FB(spi, cs, dc, rst)
+
+
+# Empezar desde acá
+
+sensor_temp = machine.ADC(4)
+conversion_factor = 3.3 / (65535)
+
+
+def display_temp(string_temperature):
+    lcd.text("-NerdCave-", 2, 0, 1)
+    lcd.text(string_temperature, 0, 12, 1)
+    lcd.clear()
+    lcd.show()
+    time.sleep(2)
+
+
+def read_temp():
+    reading = sensor_temp.read_u16() * conversion_factor
+    temperature = 27 - (reading - 0.706) / 0.001721
+    formatted_temperature = "{:.2f}".format(temperature)
+    string_temperature = str("Temp:" + formatted_temperature)
+    print(string_temperature)
+
+    return string_temperature
+
 
 while True:
-    led.toggle()
-    time.sleep(0.5)
+    temperature = read_temp()
+    display_temp(temperature)
+    lcd.fill(0)

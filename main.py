@@ -11,7 +11,6 @@ import pcd8544_fb
 from machine import Pin, SPI
 import time
 
-# pinleri ayarlıyoruz
 spi = SPI(0)
 
 spi = SPI(0, baudrate=2000000, polarity=0, phase=0, sck=Pin(6), mosi=Pin(7))
@@ -20,15 +19,12 @@ cs = Pin(5)
 dc = Pin(4)
 rst = Pin(8)
 
-# arkaplan aydınlatmasını açıyoruz
 bl = Pin(9, Pin.OUT, value=1)
 
-# ekranı başlatıyoruz.
 lcd = pcd8544_fb.PCD8544_FB(spi, cs, dc, rst)
 
 
-# Empezar desde acá
-
+# Código configurable
 sensor_temp = machine.ADC(4)
 conversion_factor = 3.3 / (65535)
 

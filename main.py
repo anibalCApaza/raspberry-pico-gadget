@@ -9,7 +9,7 @@
 
 import pcd8544_fb
 import time
-import machine
+import machine  # type: ignore
 
 spi = machine.SPI(0)
 

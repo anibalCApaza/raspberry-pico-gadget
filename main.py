@@ -8,46 +8,52 @@
 #   Gnd:                             Pico GND (38)
 
 import pcd8544_fb
-from machine import Pin, SPI
 import time
+import machine
 
-spi = SPI(0)
+spi = machine.SPI(0)
 
-spi = SPI(0, baudrate=2000000, polarity=0, phase=0, sck=Pin(6), mosi=Pin(7))
+spi = machine.SPI(
+    0, baudrate=2000000, polarity=0, phase=0, sck=machine.Pin(6), mosi=machine.Pin(7)
+)
 
-cs = Pin(5)
-dc = Pin(4)
-rst = Pin(8)
+cs = machine.Pin(5)
+dc = machine.Pin(4)
+rst = machine.Pin(8)
 
-bl = Pin(9, Pin.OUT, value=1)
+bl = machine.Pin(9, machine.Pin.OUT, value=1)
 
 lcd = pcd8544_fb.PCD8544_FB(spi, cs, dc, rst)
 
 
 # Código configurable
-sensor_temp = machine.ADC(4)
-conversion_factor = 3.3 / (65535)
 
 
-def display_temp(string_temperature):
-    lcd.text("-NerdCave-", 2, 0, 1)
-    lcd.text(string_temperature, 0, 12, 1)
-    lcd.clear()
-    lcd.show()
-    time.sleep(2)
+class TemperatureDisplay:
+    def __init__(self) -> None:
+        self.sensor_temp = machine.ADC(4)
+        self.conversion_factor = 3.3 / (65535)
+
+    def display_temp(self, string_temperature: str):
+        lcd.text("-NerdCave-", 2, 0, 1)
+        lcd.text(string_temperature, 0, 12, 1)
+        lcd.clear()
+        lcd.show()
+        time.sleep(2)
+
+    def read_temp(self) -> str:
+        reading = self.sensor_temp.read_u16() * self.conversion_factor
+        temperature = 27 - (reading - 0.706) / 0.001721
+        formatted_temperature = "{:.2f}".format(temperature)
+        string_temperature = str("Temp:" + formatted_temperature)
+        print(string_temperature)
+
+        return string_temperature
 
 
-def read_temp():
-    reading = sensor_temp.read_u16() * conversion_factor
-    temperature = 27 - (reading - 0.706) / 0.001721
-    formatted_temperature = "{:.2f}".format(temperature)
-    string_temperature = str("Temp:" + formatted_temperature)
-    print(string_temperature)
-
-    return string_temperature
-
-
-while True:
-    temperature = read_temp()
-    display_temp(temperature)
-    lcd.fill(0)
+if __name__ == "__main__":
+    temperature_display = TemperatureDisplay()
+    while True:
+        temperature = temperature_display.read_temp()
+        temperature_display.display_temp(temperature)
+        lcd.fill(0)
